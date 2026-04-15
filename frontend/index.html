@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MemoryLane – Join Event</title>
+  <meta name="theme-color" content="#0A0A0A" />
+  <meta name="description" content="Scan. Upload. Remember forever." />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100dvh; }
+
+    /* ── Hero background ── */
+    .hero-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.12;
+    }
+    .orb-1 { width: 400px; height: 400px; background: var(--gold); top: -100px; right: -80px; animation: drift1 14s ease-in-out infinite alternate; }
+    .orb-2 { width: 300px; height: 300px; background: var(--gold-dim); bottom: 0; left: -60px; animation: drift2 18s ease-in-out infinite alternate; }
+    @keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(-40px, 60px) scale(1.2); } }
+    @keyframes drift2 { from { transform: translate(0,0) scale(1); } to { transform: translate(30px,-40px) scale(1.1); } }
+
+    /* ── Page Layout ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.25rem;
+      gap: 2rem;
+    }
+
+    /* ── Hero Text ── */
+    .hero-title {
+      font-family: var(--font-brand);
+      font-size: clamp(3.5rem, 15vw, 5.5rem);
+      color: var(--gold);
+      letter-spacing: 0.12em;
+      text-align: center;
+      line-height: 0.95;
+      text-shadow: 0 0 40px rgba(212,175,55,0.25);
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .hero-sub {
+      font-family: var(--font-head);
+      font-style: italic;
+      font-size: 1.05rem;
+      color: rgba(240,237,230,0.5);
+      text-align: center;
+    }
+
+    /* ── Join Form card ── */
+    .join-card {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .join-card .card {
+      padding: 2rem 1.75rem;
+    }
+
+    .form-title {
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      color: var(--gold);
+      margin-bottom: 0.25rem;
+    }
+
+    .form-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .input-code {
+      font-family: var(--font-brand);
+      font-size: 1.4rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      text-align: center;
+      color: var(--gold);
+    }
+    .input-code::placeholder { font-family: var(--font-mono); font-size: 0.9rem; letter-spacing: 0.1em; color: var(--muted); }
+
+    /* ── Event preview banner ── */
+    .event-preview {
+      background: rgba(212,175,55,0.07);
+      border: 1px solid var(--border-lg);
+      border-radius: var(--r);
+      padding: 0.9rem 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: all 0.3s var(--ease);
+    }
+    .event-preview.visible { opacity: 1; transform: translateY(0); }
+    .event-preview-name { font-family: var(--font-head); font-size: 1.1rem; color: var(--white); }
+    .event-preview-code { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); }
+
+    /* ── Footer ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background orbs -->
+  <div class="hero-bg" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <main class="page">
+    <!-- Branding -->
+    <div class="flex flex-col items-center" style="gap:0.5rem">
+      <span class="hero-eyebrow">Powered by FCSIT UNIMAS Students</span>
+      <h1 class="hero-title">MEMORY<br>LANE</h1>
+      <span class="hero-sub">The Last Night Archive — GradMemory 2026</span>
+    </div>
+
+    <!-- Join Card -->
+    <div class="join-card fade-in">
+      <div class="card">
+        <p class="form-title">Join the Moment</p>
+        <p class="form-hint">Enter your name and the event code from the invitation</p>
+
+        <form id="join-form" style="display:flex;flex-direction:column;gap:1rem" novalidate>
+
+          <!-- Event code -->
+          <div class="form-group">
+            <label for="event-code">Event Code</label>
+            <input
+              id="event-code"
+              class="input-code"
+              type="text"
+              placeholder="GRADMEM25"
+              maxlength="20"
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="false"
+            />
+          </div>
+
+          <!-- Event preview after validation -->
+          <div id="event-preview" class="event-preview" aria-live="polite">
+            <span style="font-size:1.5rem">🎉</span>
+            <div>
+              <div class="event-preview-name" id="preview-name"></div>
+              <div class="event-preview-code" id="preview-code"></div>
+            </div>
+          </div>
+
+          <!-- Guest name -->
+          <div class="form-group">
+            <label for="guest-name">Your Name</label>
+            <input
+              id="guest-name"
+              type="text"
+              placeholder="e.g. Little Miss Khan"
+              maxlength="60"
+              autocomplete="given-name"
+            />
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn btn-primary btn-lg btn-full" id="join-btn">
+            <span id="join-btn-text">Enter the Gallery</span>
+            <div id="join-spinner" class="spinner" style="display:none"></div>
+          </button>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- Admin link -->
+    <a href="admin.html" class="text-muted text-xs" style="letter-spacing:0.1em;opacity:0.5">Admin Panel ↗</a>
+  </main>
+
+  <footer>© 2026 MemoryLane · FCSIT UNIMAS · All photos remain yours.</footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    const form = document.getElementById('join-form');
+    const codeInput = document.getElementById('event-code');
+    const nameInput = document.getElementById('guest-name');
+    const joinBtn = document.getElementById('join-btn');
+    const joinBtnText = document.getElementById('join-btn-text');
+    const joinSpinner = document.getElementById('join-spinner');
+    const previewEl = document.getElementById('event-preview');
+    const previewName = document.getElementById('preview-name');
+    const previewCode = document.getElementById('preview-code');
+
+    let validatedEvent = null;
+    let validateTimer = null;
+
+    // ── Pre-fill event code from URL ?event=XXXX ──────────────────────────────
+    const urlCode = getParam('event');
+    if (urlCode) {
+      codeInput.value = urlCode.toUpperCase();
+      validateCode(urlCode);
+    }
+
+    // ── Auto-validate code after typing stops ─────────────────────────────────
+    codeInput.addEventListener('input', () => {
+      codeInput.value = codeInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      clearTimeout(validateTimer);
+      validatedEvent = null;
+      previewEl.classList.remove('visible');
+
+      if (codeInput.value.length >= 4) {
+        validateTimer = setTimeout(() => validateCode(codeInput.value), 600);
+      }
+    });
+
+    async function validateCode(code) {
+      const { ok, data } = await apiFetch(`/events/validate/${code}`);
+      if (ok && data.success) {
+        validatedEvent = data.event;
+        previewName.textContent = data.event.event_name;
+        previewCode.textContent = `Code: ${data.event.event_code}`;
+        previewEl.classList.add('visible');
+      } else {
+        previewEl.classList.remove('visible');
+        validatedEvent = null;
+      }
+    }
+
+    // ── Join form submit ───────────────────────────────────────────────────────
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const code = codeInput.value.trim();
+      const name = nameInput.value.trim();
+
+      if (!code) return showToast('Please enter an event code', 'error');
+      if (!name) return showToast('Please enter your name', 'error');
+      if (name.length < 2) return showToast('Name must be at least 2 characters', 'error');
+
+      setLoading(true);
+
+      const { ok, data } = await apiFetch('/users/join', {
+        method: 'POST',
+        body: JSON.stringify({ name, event_code: code }),
+      });
+
+      setLoading(false);
+
+      if (!ok || !data.success) {
+        return showToast(data.message || 'Failed to join event', 'error');
+      }
+
+      // Save session
+      Session.set(CONFIG.KEY_USER_ID,    data.user._id);
+      Session.set(CONFIG.KEY_USER_NAME,  data.user.name);
+      Session.set(CONFIG.KEY_EVENT_CODE, data.event.event_code);
+      Session.set(CONFIG.KEY_EVENT_NAME, data.event.event_name);
+      Session.set(CONFIG.KEY_EVENT_ID,   data.event._id);
+
+      showToast(`Welcome, ${data.user.name}! 🎉`, 'success');
+
+      setTimeout(() => {
+        window.location.href = `gallery.html?event=${data.event.event_code}`;
+      }, 600);
+    });
+
+    function setLoading(on) {
+      joinBtn.disabled = on;
+      joinBtnText.textContent = on ? 'Joining…' : 'Enter the Gallery';
+      joinSpinner.style.display = on ? 'block' : 'none';
+    }
+  </script>
+</body>
+</html>

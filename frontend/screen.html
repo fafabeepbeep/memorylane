@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MemoryLane – Live Screen</title>
+  <meta name="theme-color" content="#000000" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; background: #000; overflow: hidden; }
+
+    /* ── Slideshow container ── */
+    #slideshow {
+      position: fixed; inset: 0;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .slide.active { opacity: 1; }
+    .slide.prev   { opacity: 0; }
+
+    .slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: brightness(0.92);
+    }
+
+    /* Ken Burns zoom */
+    .slide.active img {
+      animation: kenBurns 8s ease-in-out forwards;
+    }
+    @keyframes kenBurns {
+      from { transform: scale(1);    }
+      to   { transform: scale(1.07); }
+    }
+
+    /* Blurred background for letterbox fill */
+    .slide-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: blur(40px) brightness(0.25) saturate(1.5);
+      transform: scale(1.1);
+      z-index: 0;
+    }
+    .slide img { position: relative; z-index: 1; }
+
+    /* ── Caption bar ── */
+    .caption {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+      padding: 2.5rem 2.5rem 2rem;
+      z-index: 2;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .caption-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      color: rgba(240,237,230,0.9);
+    }
+    .caption-time {
+      font-family: 'DM Mono', monospace;
+      font-size: clamp(0.65rem, 1.2vw, 0.85rem);
+      color: rgba(240,237,230,0.4);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── Brand watermark ── */
+    .watermark {
+      position: fixed;
+      top: 1.5rem; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(212,175,55,0.2);
+      border-radius: 999px;
+      padding: 0.5rem 1.25rem;
+    }
+    .watermark-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.15em;
+      color: #D4AF37;
+    }
+    .watermark-dot { width: 6px; height: 6px; border-radius: 50%; background: #2ECC71; box-shadow: 0 0 6px #2ECC71; animation: blink 2s infinite; }
+    @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+    .watermark-count { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: rgba(240,237,230,0.5); letter-spacing: 0.08em; }
+
+    /* ── Thumbnail strip ── */
+    .thumb-strip {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 8px;
+      background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+      z-index: 5;
+      overflow: hidden;
+    }
+    .thumb {
+      width: 70px;
+      height: 70px;
+      flex-shrink: 0;
+      border-radius: 4px;
+      overflow: hidden;
+      opacity: 0.4;
+      transition: all 0.5s ease;
+      cursor: default;
+    }
+    .thumb.active-thumb { opacity: 1; transform: scale(1.08); border: 2px solid #D4AF37; }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── Event code prompt (when no event set) ── */
+    .setup-prompt {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      z-index: 20;
+    }
+    .setup-prompt.hidden { display: none; }
+    .setup-prompt h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; color: #D4AF37; letter-spacing: 0.15em; }
+    .setup-prompt p { color: rgba(240,237,230,0.5); font-family: 'DM Mono', monospace; font-size: 0.85rem; letter-spacing: 0.1em; }
+    .setup-input { background: #111; border: 1px solid rgba(212,175,55,0.3); color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.2em; text-align: center; padding: 0.75rem 1.5rem; border-radius: 8px; width: 260px; outline: none; }
+    .setup-input:focus { border-color: #D4AF37; }
+    .setup-btn { background: #D4AF37; color: #000; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+
+    /* ── No photos state ── */
+    .no-photos {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 1rem; z-index: 15;
+    }
+    .no-photos.hidden { display: none; }
+    .no-photos p { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.4rem; color: rgba(240,237,230,0.3); }
+
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@1,300&family=DM+Mono&display=swap');
+  </style>
+</head>
+<body>
+
+  <!-- Setup prompt -->
+  <div class="setup-prompt" id="setup-prompt">
+    <h1>MEMORYLANE</h1>
+    <p>ENTER THE EVENT CODE TO START THE DISPLAY</p>
+    <input class="setup-input" id="screen-code-input" type="text" placeholder="EVENTCODE" maxlength="20" autocomplete="off" />
+    <button class="setup-btn" id="screen-start-btn">Start Display</button>
+  </div>
+
+  <!-- No photos state -->
+  <div class="no-photos hidden" id="no-photos-state">
+    <div style="font-size:4rem;opacity:0.2">📸</div>
+    <p>Waiting for photos to arrive…</p>
+  </div>
+
+  <!-- Brand watermark -->
+  <div class="watermark">
+    <div class="watermark-dot"></div>
+    <span class="watermark-logo">MEMORYLANE</span>
+    <span class="watermark-count" id="wm-count">0 photos</span>
+  </div>
+
+  <!-- Slideshow -->
+  <div id="slideshow"></div>
+
+  <!-- Thumbnail strip -->
+  <div class="thumb-strip" id="thumb-strip"></div>
+
+  <script>
+    const API_URL = 'http://localhost:3001/api';
+    const WS_URL  = 'ws://localhost:3001/ws';
+    const SLIDE_DURATION = 6000; // ms per slide
+
+    let photos = [];
+    let currentIdx = 0;
+    let slideTimer = null;
+    let eventCode = '';
+    let ws = null;
+
+    // ── Setup ─────────────────────────────────────────────────────────────────
+    const urlCode = new URLSearchParams(window.location.search).get('event');
+    if (urlCode) {
+      document.getElementById('setup-prompt').classList.add('hidden');
+      startScreen(urlCode.toUpperCase());
+    }
+
+    document.getElementById('screen-start-btn').addEventListener('click', () => {
+      const code = document.getElementById('screen-code-input').value.trim().toUpperCase();
+      if (!code) return;
+      document.getElementById('setup-prompt').classList.add('hidden');
+      startScreen(code);
+    });
+
+    document.getElementById('screen-code-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('screen-start-btn').click();
+    });
+
+    // ── Core logic ────────────────────────────────────────────────────────────
+    async function startScreen(code) {
+      eventCode = code;
+      await loadPhotos();
+      connectWS();
+      setInterval(loadPhotos, 30000); // full refresh every 30s
+    }
+
+    async function loadPhotos() {
+      try {
+        const res = await fetch(`${API_URL}/photos/${eventCode}?limit=100`);
+        const data = await res.json();
+        if (data.success && data.photos.length > 0) {
+          // Add only new photos to avoid resetting slideshow
+          const existingIds = new Set(photos.map(p => p._id));
+          const newPhotos = data.photos.filter(p => !existingIds.has(p._id));
+          photos = [...data.photos]; // keep sorted by newest first, show in order
+
+          newPhotos.forEach(addThumb);
+
+          document.getElementById('no-photos-state').classList.add('hidden');
+          document.getElementById('wm-count').textContent = `${photos.length} photo${photos.length !== 1 ? 's' : ''}`;
+
+          if (!slideTimer && photos.length > 0) {
+            buildSlide(currentIdx % photos.length);
+            startSlideshow();
+          }
+        } else {
+          if (photos.length === 0) document.getElementById('no-photos-state').classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Load error:', err);
+      }
+    }
+
+    // ── Slideshow ─────────────────────────────────────────────────────────────
+    function buildSlide(idx) {
+      const photo = photos[idx];
+      if (!photo) return;
+
+      const ss = document.getElementById('slideshow');
+
+      // Remove old prev slides
+      ss.querySelectorAll('.slide.prev').forEach(el => el.remove());
+
+      // Mark current as prev
+      const current = ss.querySelector('.slide.active');
+      if (current) current.classList.replace('active', 'prev');
+
+      // Create new slide
+      const slide = document.createElement('div');
+      slide.className = 'slide';
+
+      slide.innerHTML = `
+        <div class="slide-bg" style="background-image:url('${photo.image_url}')"></div>
+        <img src="${photo.image_url}" alt="" loading="lazy" />
+        <div class="caption">
+          <div>
+            <div class="caption-name">by ${photo.user_name}</div>
+          </div>
+          <div class="caption-time">${formatScreenTime(photo.timestamp)}</div>
+        </div>
+      `;
+      ss.appendChild(slide);
+
+      // Trigger reflow for animation
+      slide.getBoundingClientRect();
+      slide.classList.add('active');
+
+      // Thumbnail highlight
+      updateThumbHighlight(idx);
+    }
+
+    function startSlideshow() {
+      if (photos.length === 0) return;
+      clearInterval(slideTimer);
+      slideTimer = setInterval(() => {
+        currentIdx = (currentIdx + 1) % photos.length;
+        buildSlide(currentIdx);
+      }, SLIDE_DURATION);
+    }
+
+    // ── Thumbnails ────────────────────────────────────────────────────────────
+    function addThumb(photo) {
+      const strip = document.getElementById('thumb-strip');
+      const thumb = document.createElement('div');
+      thumb.className = 'thumb';
+      thumb.dataset.id = photo._id;
+      thumb.innerHTML = `<img src="${photo.image_url}" alt="" loading="lazy" />`;
+      strip.appendChild(thumb);
+    }
+
+    function updateThumbHighlight(idx) {
+      const thumbs = document.querySelectorAll('.thumb');
+      thumbs.forEach((t, i) => t.classList.toggle('active-thumb', i === idx));
+
+      // Scroll thumb into view
+      const active = thumbs[idx];
+      if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+
+    // ── WebSocket ─────────────────────────────────────────────────────────────
+    function connectWS() {
+      try {
+        ws = new WebSocket(`${WS_URL}?event=${eventCode}`);
+
+        ws.onmessage = (e) => {
+          const msg = JSON.parse(e.data);
+          if (msg.type === 'NEW_PHOTO' && msg.photo) {
+            photos.unshift(msg.photo);
+            addThumb(msg.photo);
+            document.getElementById('wm-count').textContent = `${photos.length} photos`;
+
+            // Jump to new photo
+            clearInterval(slideTimer);
+            currentIdx = 0;
+            buildSlide(0);
+            startSlideshow();
+          }
+        };
+
+        ws.onclose = () => setTimeout(connectWS, 4000);
+      } catch {}
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    function formatScreenTime(ts) {
+      return new Date(ts).toLocaleString('en-MY', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    }
+  </script>
+</body>
+</html>
