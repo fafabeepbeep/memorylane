@@ -48,8 +48,7 @@ const eventSchema = new mongoose.Schema(
   { timestamps: false }
 );
 
-// Index for fast lookup by event code
-eventSchema.index({ event_code: 1 });
+// Index for fast lookup (event_code already has a unique index from `unique: true`)
 eventSchema.index({ is_active: 1 });
 
 // Virtual: is the event expired?

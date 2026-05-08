@@ -62,6 +62,12 @@ const photoSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    expires_at: {
+      type: Date,
+      // Default = 24 hours after creation
+      default: () => new Date(Date.now() + 24 * 60 * 60 * 1000),
+      required: true,
+    },
   },
   { timestamps: false }
 );
@@ -69,5 +75,7 @@ const photoSchema = new mongoose.Schema(
 photoSchema.index({ event_id: 1, approved: 1, timestamp: -1 });
 photoSchema.index({ event_id: 1, timestamp: -1 });
 photoSchema.index({ user_id: 1 });
+// MongoDB TTL: auto-deletes documents after expires_at passes (Mongo runs check ~every 60s)
+photoSchema.index({ expires_at: 1 }, { expireAfterSeconds: 0 });
 
 module.exports = mongoose.model('Photo', photoSchema);
