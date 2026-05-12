@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin – MemoryLane</title>
   <meta name="theme-color" content="#0A0A0A" />
   <link rel="stylesheet" href="css/style.css" />
@@ -12,167 +12,170 @@
     /* ── Auth gate ── */
     .auth-gate {
       position: fixed; inset: 0;
-      background: var(--bg);
+      background: rgba(10,10,10,0.96);
+      backdrop-filter: blur(10px);
       z-index: 9999;
       display: flex; align-items: center; justify-content: center;
       padding: 1.5rem;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
     }
-    .auth-gate.hidden { display: none; }
+    .auth-gate.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-    /* ── Sidebar + main layout ── */
-    .admin-layout {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
+    .admin-layout { display: flex; flex: 1; overflow: hidden; min-height: 0; }
 
     .sidebar {
-      width: 220px;
-      flex-shrink: 0;
-      background: var(--bg-card);
+      width: 220px; flex-shrink: 0;
+      background: rgba(17,17,17,0.85);
+      backdrop-filter: blur(8px);
       border-right: 1px solid var(--border);
       padding: 1.5rem 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
+      display: flex; flex-direction: column; gap: 0.4rem;
     }
-
     .sidebar-label {
       font-family: var(--font-mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 0.75rem 0.6rem 0.3rem;
+      font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); padding: 0.75rem 0.6rem 0.3rem;
     }
-
     .nav-item {
       display: flex; align-items: center; gap: 0.6rem;
       padding: 0.65rem 0.75rem;
-      border-radius: var(--r);
-      cursor: pointer;
+      border-radius: var(--r); cursor: pointer;
       transition: all var(--t) var(--ease);
       border: 1px solid transparent;
-      font-size: 0.875rem;
-      color: var(--muted);
-      background: none;
-      width: 100%;
-      text-align: left;
+      font-size: 0.875rem; color: var(--muted);
+      background: none; width: 100%; text-align: left;
+      font-family: var(--font-body);
     }
     .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
     .nav-item.active { color: var(--gold); background: rgba(212,175,55,0.08); border-color: var(--border); }
 
     .admin-main { flex: 1; overflow-y: auto; padding: 2rem; }
 
-    /* ── Panels ── */
     .panel { display: none; }
     .panel.active { display: block; animation: fadeIn 0.3s var(--ease); }
 
     .panel-title {
       font-family: var(--font-head);
-      font-size: 1.8rem;
-      color: var(--gold);
-      margin-bottom: 0.25rem;
+      font-size: 1.8rem; color: var(--gold); margin-bottom: 0.25rem;
     }
     .panel-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.75rem; }
 
-    /* ── Stat cards ── */
-    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem; margin-bottom: 2rem;
+    }
     .stat-card {
-      background: var(--bg-card);
+      background: rgba(17,17,17,0.7);
+      backdrop-filter: blur(8px);
       border: 1px solid var(--border);
-      border-radius: var(--r-lg);
-      padding: 1.25rem;
+      border-radius: var(--r-lg); padding: 1.25rem;
     }
     .stat-value { font-family: var(--font-brand); font-size: 2.2rem; color: var(--gold); }
     .stat-label { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-top: 0.25rem; }
 
-    /* ── Create event form ── */
     .create-form { max-width: 520px; }
     .code-suggestion {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      color: var(--gold-dim);
-      margin-top: 0.3rem;
-      cursor: pointer;
+      font-family: var(--font-mono); font-size: 0.72rem; color: var(--gold-dim);
+      margin-top: 0.3rem; cursor: pointer;
     }
     .code-suggestion span { text-decoration: underline; }
 
-    /* ── QR popup ── */
     .qr-popup {
-      background: var(--bg-card);
+      background: rgba(17,17,17,0.85);
+      backdrop-filter: blur(8px);
       border: 1px solid var(--border-lg);
-      border-radius: var(--r-lg);
-      padding: 1.75rem;
-      margin-top: 1.5rem;
-      display: none;
+      border-radius: var(--r-lg); padding: 1.75rem;
+      margin-top: 1.5rem; display: none;
       animation: fadeIn 0.3s var(--ease);
     }
     .qr-popup.visible { display: flex; flex-direction: column; gap: 1rem; align-items: center; }
     .qr-popup h3 { font-family: var(--font-head); font-size: 1.3rem; color: var(--gold); text-align: center; }
 
-    /* ── Events table ── */
-    .event-row-code {
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      color: var(--gold);
-      letter-spacing: 0.1em;
-    }
+    .event-row-code { font-family: var(--font-mono); font-size: 0.85rem; color: var(--gold); letter-spacing: 0.1em; }
 
-    /* ── Moderation grid ── */
     .mod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
     .mod-card {
-      background: var(--bg-card);
+      background: rgba(17,17,17,0.7);
+      backdrop-filter: blur(8px);
       border: 1px solid var(--border);
-      border-radius: var(--r);
-      overflow: hidden;
-      position: relative;
+      border-radius: var(--r); overflow: hidden; position: relative;
     }
     .mod-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-    .mod-card-actions {
-      display: flex;
-      gap: 0.5rem;
-      padding: 0.6rem;
-    }
+    .mod-card-actions { display: flex; gap: 0.5rem; padding: 0.6rem; }
     .mod-pending { border-color: rgba(212,175,55,0.4); }
     .pending-badge {
-      position: absolute;
-      top: 0.5rem; right: 0.5rem;
-      background: rgba(212,175,55,0.9);
-      color: #000;
-      font-size: 0.6rem;
-      font-family: var(--font-mono);
-      letter-spacing: 0.1em;
-      padding: 0.2rem 0.4rem;
-      border-radius: var(--r-pill);
+      position: absolute; top: 0.5rem; right: 0.5rem;
+      background: rgba(212,175,55,0.9); color: #000;
+      font-size: 0.6rem; font-family: var(--font-mono); letter-spacing: 0.1em;
+      padding: 0.2rem 0.4rem; border-radius: var(--r-pill);
     }
 
-    /* ── Responsive ── */
+    /* Auth gate card */
+    .auth-card {
+      background: rgba(17,17,17,0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-lg);
+      border-radius: var(--r-lg);
+      padding: 2.25rem 2rem;
+      max-width: 380px; width: 100%;
+      box-shadow: var(--shadow-lg);
+    }
+
     @media (max-width: 640px) {
       .sidebar { display: none; }
       .admin-main { padding: 1.25rem; }
+    }
+
+    table { background: rgba(17,17,17,0.5); border-radius: var(--r); overflow: hidden; }
+
+    /* Floating cleanup badge */
+    .cleanup-info {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--r-pill);
+      background: rgba(212,175,55,0.08);
+      border: 1px solid var(--border);
+      font-family: var(--font-mono); font-size: 0.65rem;
+      color: var(--gold-dim); letter-spacing: 0.08em;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
 
-  <!-- Auth Gate -->
+  <!-- ─── Auth Gate ────────────────────────────────────────────────────────── -->
   <div class="auth-gate" id="auth-gate">
-    <div class="card" style="max-width:380px;width:100%">
+    <div class="auth-card">
       <div style="text-align:center;margin-bottom:1.5rem">
         <div style="font-family:var(--font-brand);font-size:1.8rem;color:var(--gold);letter-spacing:0.1em">ADMIN</div>
         <div class="text-muted text-sm">MemoryLane Control Panel</div>
       </div>
-      <div class="form-group">
-        <label for="admin-key-input">Admin Secret Key</label>
-        <input id="admin-key-input" type="password" placeholder="Enter admin secret…" autocomplete="current-password" />
+
+      <form id="auth-form" novalidate>
+        <div class="form-group">
+          <label for="admin-key-input">Admin Secret Key</label>
+          <input id="admin-key-input" type="password" placeholder="Enter admin secret…"
+                 autocomplete="current-password" autofocus />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="auth-submit" style="margin-top:1rem">
+          <span id="auth-btn-text">Authenticate</span>
+          <div id="auth-spinner" class="spinner" style="display:none"></div>
+        </button>
+      </form>
+
+      <div id="auth-error" style="margin-top:0.85rem;display:none;font-size:0.82rem;line-height:1.5;
+                                  padding:0.7rem 0.9rem;border-radius:var(--r);
+                                  background:rgba(192,57,43,0.08);border:1px solid rgba(192,57,43,0.25);
+                                  color:#E74C3C"></div>
+
+      <div class="text-muted text-xs" style="text-align:center;margin-top:1rem;font-family:var(--font-mono);letter-spacing:0.1em">
+        API: <span id="auth-api-url"></span>
       </div>
-      <button class="btn btn-primary btn-full" id="auth-submit" style="margin-top:1rem">Authenticate</button>
-      <div id="auth-error" class="text-sm" style="color:var(--danger);text-align:center;margin-top:0.75rem;display:none"></div>
     </div>
   </div>
 
-  <!-- Navbar -->
+  <!-- ─── Navbar ──────────────────────────────────────────────────────────── -->
   <nav class="navbar">
     <div class="logo">
       <div class="logo-mark"></div>
@@ -187,31 +190,31 @@
     </div>
   </nav>
 
-  <!-- Main layout -->
+  <!-- ─── Layout ──────────────────────────────────────────────────────────── -->
   <div class="admin-layout">
-
-    <!-- Sidebar -->
     <aside class="sidebar">
       <span class="sidebar-label">Dashboard</span>
       <button class="nav-item active" data-panel="dashboard">📊 Overview</button>
       <button class="nav-item" data-panel="create">✨ Create Event</button>
-
       <span class="sidebar-label">Events</span>
       <button class="nav-item" data-panel="events">🗂️ All Events</button>
       <button class="nav-item" data-panel="moderation">🛡️ Moderation</button>
-
       <span class="sidebar-label">Links</span>
       <a href="index.html" class="nav-item" style="text-decoration:none">🏠 Guest View</a>
       <a href="screen.html" class="nav-item" target="_blank" style="text-decoration:none">📺 Screen</a>
     </aside>
 
-    <!-- Main content -->
     <main class="admin-main">
 
-      <!-- ── Overview panel ── -->
+      <!-- Overview -->
       <div class="panel active" id="panel-dashboard">
         <h1 class="panel-title">Overview</h1>
         <p class="panel-sub">Live snapshot of all events</p>
+
+        <div id="cleanup-status" class="cleanup-info">
+          <span>⏳</span><span id="cleanup-status-text">Photos auto-delete after 24 hours</span>
+          <button class="btn btn-ghost btn-sm" id="manual-cleanup-btn" style="padding:0.2rem 0.6rem;font-size:0.65rem;margin-left:0.5rem">Run Now</button>
+        </div>
 
         <div class="stat-grid">
           <div class="stat-card"><div class="stat-value" id="stat-events">–</div><div class="stat-label">Total Events</div></div>
@@ -222,60 +225,50 @@
 
         <h2 style="font-family:var(--font-head);font-size:1.2rem;margin-bottom:1rem">Recent Events</h2>
         <div class="table-wrap">
-          <table id="dashboard-table">
-            <thead>
-              <tr>
-                <th>Event Name</th><th>Code</th><th>Status</th><th>Photos</th><th>Guests</th><th>Actions</th>
-              </tr>
-            </thead>
+          <table>
+            <thead><tr><th>Event Name</th><th>Code</th><th>Status</th><th>Photos</th><th>Guests</th><th>Actions</th></tr></thead>
             <tbody id="dashboard-tbody"></tbody>
           </table>
         </div>
       </div>
 
-      <!-- ── Create Event panel ── -->
+      <!-- Create -->
       <div class="panel" id="panel-create">
         <h1 class="panel-title">Create Event</h1>
-        <p class="panel-sub">Each event gets a unique code for QR access</p>
+        <p class="panel-sub">Each event gets a unique code for QR access. Photos auto-delete after 24 hours.</p>
 
         <form class="create-form card" id="create-event-form" style="display:flex;flex-direction:column;gap:1.1rem">
-
           <div class="form-group">
             <label>Event Name</label>
-            <input id="new-event-name" type="text" placeholder="e.g. GradNight 2025 – FCSIT UNIMAS" maxlength="100" required />
+            <input id="new-event-name" type="text" placeholder="e.g. GradNight 2026 – FCSIT UNIMAS" maxlength="100" required />
           </div>
-
           <div class="form-group">
             <label>Event Code <span class="text-muted text-xs">(letters & numbers, no spaces)</span></label>
-            <input id="new-event-code" class="mono" type="text" placeholder="e.g. GRADMEM25" maxlength="20"
+            <input id="new-event-code" class="mono" type="text" placeholder="e.g. GRADMEM26" maxlength="20"
                    style="text-transform:uppercase;letter-spacing:0.15em" required />
             <div class="code-suggestion" id="code-suggestion"></div>
           </div>
-
           <div class="form-group">
             <label>Event End Time <span class="text-muted text-xs">(optional)</span></label>
             <input id="new-event-end" type="datetime-local" />
           </div>
-
-          <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;font-family:var(--font-body)">
+          <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer">
             <input type="checkbox" id="new-moderation" style="width:auto;accent-color:var(--gold)" />
             <span style="font-size:0.875rem">Enable moderation (photos require approval)</span>
           </label>
-
           <button type="submit" class="btn btn-primary" id="create-btn">
             <span id="create-btn-text">Create Event</span>
             <div id="create-spinner" class="spinner" style="display:none"></div>
           </button>
         </form>
 
-        <!-- QR popup shown after creation -->
         <div class="qr-popup" id="qr-popup">
           <h3 id="qr-event-name"></h3>
           <div class="qr-container">
-            <div class="qr-frame pulse"><img id="qr-img" src="" alt="QR Code" /></div>
+            <div class="qr-frame pulse"><img id="qr-img" src="" alt="QR" /></div>
             <div style="text-align:center">
               <div class="mono text-gold" id="qr-code-text" style="font-size:1.2rem;letter-spacing:0.2em"></div>
-              <div class="text-muted text-xs" style="margin-top:0.25rem">Scan or share the code</div>
+              <div class="text-muted text-xs" style="margin-top:0.25rem">Scan or share the link</div>
             </div>
           </div>
           <div style="display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center">
@@ -286,32 +279,26 @@
         </div>
       </div>
 
-      <!-- ── Events List panel ── -->
+      <!-- Events list -->
       <div class="panel" id="panel-events">
         <h1 class="panel-title">All Events</h1>
         <p class="panel-sub">Manage event status and access</p>
         <div class="table-wrap">
           <table>
-            <thead>
-              <tr><th>Name</th><th>Code</th><th>Status</th><th>End Time</th><th>Photos</th><th>Actions</th></tr>
-            </thead>
+            <thead><tr><th>Name</th><th>Code</th><th>Status</th><th>End Time</th><th>Photos</th><th>Actions</th></tr></thead>
             <tbody id="events-tbody"></tbody>
           </table>
         </div>
       </div>
 
-      <!-- ── Moderation panel ── -->
+      <!-- Moderation -->
       <div class="panel" id="panel-moderation">
         <h1 class="panel-title">Photo Moderation</h1>
         <p class="panel-sub">Review and approve pending photos</p>
-
         <div style="display:flex;gap:0.75rem;margin-bottom:1.25rem;flex-wrap:wrap">
-          <select id="mod-event-select" style="max-width:260px">
-            <option value="">Select Event…</option>
-          </select>
+          <select id="mod-event-select" style="max-width:260px"><option value="">Select Event…</option></select>
           <button class="btn btn-outline btn-sm" id="mod-load-btn">Load Photos</button>
         </div>
-
         <div class="mod-grid" id="mod-grid"></div>
         <div id="mod-empty" class="empty-state" style="display:none">
           <div class="empty-icon">✅</div>
@@ -324,84 +311,111 @@
 
   <script src="js/config.js"></script>
   <script src="js/utils.js"></script>
+  <script src="js/stars.js"></script>
   <script>
-    // ── Auth ─────────────────────────────────────────────────────────────────
+    // ── Show API URL on auth screen for debugging ───────────────────────────
+    document.getElementById('auth-api-url').textContent = CONFIG.API_BASE;
+
+    // ── Auth state ──────────────────────────────────────────────────────────
     let adminSecret = sessionStorage.getItem('ml_admin_secret') || '';
 
-    function adminHeaders() {
-      return { 'x-admin-secret': adminSecret };
+    function adminHeaders() { return { 'x-admin-secret': adminSecret }; }
+    function showAuthError(msg, html = false) {
+      const el = document.getElementById('auth-error');
+      if (html) el.innerHTML = msg; else el.textContent = msg;
+      el.style.display = 'block';
+    }
+    function hideAuthError() { document.getElementById('auth-error').style.display = 'none'; }
+    function setAuthLoading(on) {
+      document.getElementById('auth-submit').disabled = on;
+      document.getElementById('auth-btn-text').textContent = on ? 'Verifying…' : 'Authenticate';
+      document.getElementById('auth-spinner').style.display = on ? 'block' : 'none';
     }
 
-    async function verifyAdmin(secret) {
-      const { ok } = await apiFetch('/events', { headers: { 'x-admin-secret': secret } });
-      return ok;
+    async function attemptLogin(secret) {
+      hideAuthError();
+      setAuthLoading(true);
+
+      const result = await apiFetch('/admin/login', {
+        method: 'POST',
+        body: JSON.stringify({ secret }),
+        retries: 1,
+        timeout: 12000,
+      });
+
+      setAuthLoading(false);
+
+      if (result.ok && result.data.success) {
+        adminSecret = result.data.token || secret;
+        sessionStorage.setItem('ml_admin_secret', adminSecret);
+        document.getElementById('auth-gate').classList.add('hidden');
+        loadDashboard();
+        return true;
+      }
+
+      // Granular error messages
+      if (result.status === 0) {
+        showAuthError(
+          `⚠️ Cannot reach the API server at <code style="color:var(--gold)">${CONFIG.API_BASE}</code><br>` +
+          `<small style="opacity:0.75">• Make sure the backend is running<br>` +
+          `• If on phone, ensure same WiFi as the laptop<br>` +
+          `• Try opening <code>${CONFIG.API_BASE}/health</code> in browser</small>`,
+          true
+        );
+      } else if (result.status === 401) {
+        showAuthError('Wrong secret key. Check ADMIN_SECRET in your .env file.');
+      } else if (result.status === 429) {
+        showAuthError('Too many failed attempts. Wait 15 minutes and try again.');
+      } else if (result.status === 500) {
+        showAuthError('Server error: ' + (result.data?.message || 'check backend logs'));
+      } else {
+        showAuthError(result.data?.message || `HTTP ${result.status} error`);
+      }
+      return false;
     }
 
-    // Check existing session
+    // ── On load: try to verify existing token ─────────────────────────────────
     if (adminSecret) {
-      verifyAdmin(adminSecret).then(ok => {
-        if (ok) document.getElementById('auth-gate').classList.add('hidden');
-        else adminSecret = '';
+      apiFetch('/admin/verify', {
+        method: 'POST',
+        headers: { 'x-admin-secret': adminSecret },
+      }).then((r) => {
+        if (r.ok && r.data.success) {
+          document.getElementById('auth-gate').classList.add('hidden');
+          loadDashboard();
+        } else {
+          adminSecret = '';
+          sessionStorage.removeItem('ml_admin_secret');
+        }
       });
     }
 
-    document.getElementById('auth-submit').addEventListener('click', async () => {
+    // ── Form submit ──────────────────────────────────────────────────────────
+    document.getElementById('auth-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
       const key = document.getElementById('admin-key-input').value.trim();
-      if (!key) return;
-
-      const errEl = document.getElementById('auth-error');
-      errEl.style.display = 'none';
-
-      const btn = document.getElementById('auth-submit');
-      btn.disabled = true;
-      btn.textContent = 'Verifying…';
-
-      const result = await apiFetch('/events', { headers: { 'x-admin-secret': key } });
-
-      btn.disabled = false;
-      btn.textContent = 'Authenticate';
-
-      if (result.ok) {
-        adminSecret = key;
-        sessionStorage.setItem('ml_admin_secret', key);
-        document.getElementById('auth-gate').classList.add('hidden');
-        loadDashboard();
-      } else {
-        errEl.style.display = 'block';
-        if (result.status === 0) {
-          // Network / CORS error — backend unreachable
-          errEl.innerHTML = `
-            ⚠️ Cannot reach backend at <code style="color:var(--gold)">${CONFIG.API_URL}</code><br>
-            <small style="opacity:0.7">Make sure the backend is running: <code>npm run dev</code> in /backend</small>
-          `;
-        } else if (result.status === 403) {
-          errEl.textContent = 'Wrong secret key. Check ADMIN_SECRET in your .env file.';
-        } else {
-          errEl.textContent = result.data?.message || `Error ${result.status}`;
-        }
-      }
+      if (!key) { showAuthError('Please enter the admin secret'); return; }
+      await attemptLogin(key);
     });
 
-    document.getElementById('admin-key-input').addEventListener('keydown', e => {
-      if (e.key === 'Enter') document.getElementById('auth-submit').click();
-    });
-
+    // ── Logout ────────────────────────────────────────────────────────────────
     document.getElementById('admin-logout').addEventListener('click', () => {
       sessionStorage.removeItem('ml_admin_secret');
       adminSecret = '';
       document.getElementById('auth-gate').classList.remove('hidden');
+      document.getElementById('admin-key-input').value = '';
+      document.getElementById('admin-key-input').focus();
     });
 
     // ── Panel navigation ──────────────────────────────────────────────────────
     const navItems = document.querySelectorAll('.nav-item[data-panel]');
-    navItems.forEach(btn => {
+    navItems.forEach((btn) => {
       btn.addEventListener('click', () => {
-        navItems.forEach(n => n.classList.remove('active'));
+        navItems.forEach((n) => n.classList.remove('active'));
         btn.classList.add('active');
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
         document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
 
-        // Load data per panel
         if (btn.dataset.panel === 'dashboard') loadDashboard();
         if (btn.dataset.panel === 'events') loadEventsTable();
         if (btn.dataset.panel === 'moderation') loadModerationEvents();
@@ -414,7 +428,7 @@
       if (!ok) return;
 
       const events = data.events || [];
-      const active = events.filter(e => e.is_active).length;
+      const active = events.filter((e) => e.is_active).length;
       const photos = events.reduce((s, e) => s + (e.photo_count || 0), 0);
       const guests = events.reduce((s, e) => s + (e.guest_count || 0), 0);
 
@@ -423,69 +437,81 @@
       document.getElementById('stat-photos').textContent = photos;
       document.getElementById('stat-guests').textContent = guests;
 
+      // Cleanup status
+      apiFetch('/admin/cleanup/status', { headers: adminHeaders() }).then((r) => {
+        if (r.ok && r.data.status?.lastRun) {
+          const lr = r.data.status.lastRun;
+          document.getElementById('cleanup-status-text').textContent =
+            `Photos auto-delete after 24h · Last cleanup ${timeAgo(lr.time)} · ${r.data.status.totalDeleted} total deleted`;
+        }
+      });
+
       const tbody = document.getElementById('dashboard-tbody');
       tbody.innerHTML = '';
-      events.slice(0, 10).forEach(ev => {
+      events.slice(0, 10).forEach((ev) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${ev.event_name}</td>
+          <td>${escapeHtml(ev.event_name)}</td>
           <td><span class="event-row-code">${ev.event_code}</span></td>
           <td>${ev.is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-muted">Closed</span>'}</td>
           <td>${ev.photo_count || 0}</td>
           <td>${ev.guest_count || 0}</td>
-          <td style="display:flex;gap:0.4rem">
-            <button class="btn btn-outline btn-sm" onclick="copyEventLink('${ev.event_code}')">QR</button>
+          <td style="display:flex;gap:0.4rem;flex-wrap:wrap">
+            <button class="btn btn-outline btn-sm" onclick="showQR('${ev.event_code}', '${escapeAttr(ev.event_name)}')">QR</button>
             <button class="btn btn-ghost btn-sm" onclick="toggleEventStatus('${ev._id}', ${ev.is_active})">${ev.is_active ? 'Close' : 'Open'}</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteEvent('${ev._id}','${ev.event_name}')">Del</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteEvent('${ev._id}','${escapeAttr(ev.event_name)}')">Del</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
     }
+
+    document.getElementById('manual-cleanup-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('manual-cleanup-btn');
+      btn.disabled = true; btn.textContent = 'Running…';
+      const { ok, data } = await apiFetch('/admin/cleanup', { method: 'POST', headers: adminHeaders() });
+      btn.disabled = false; btn.textContent = 'Run Now';
+      if (ok) {
+        showToast(`Cleanup done: ${data.result?.deleted || 0} expired photo(s) removed`, 'success');
+        loadDashboard();
+      } else showToast('Cleanup failed', 'error');
+    });
 
     // ── Events table ──────────────────────────────────────────────────────────
     async function loadEventsTable() {
       const { ok, data } = await apiFetch('/events', { headers: adminHeaders() });
       if (!ok) return;
-
       const tbody = document.getElementById('events-tbody');
       tbody.innerHTML = '';
-      (data.events || []).forEach(ev => {
+      (data.events || []).forEach((ev) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${ev.event_name}</td>
+          <td>${escapeHtml(ev.event_name)}</td>
           <td><span class="event-row-code">${ev.event_code}</span></td>
           <td>${ev.is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-muted">Closed</span>'}</td>
-          <td class="text-xs mono">${ev.event_end_time ? new Date(ev.event_end_time).toLocaleString('en-MY') : '—'}</td>
+          <td class="text-xs mono">${ev.event_end_time ? new Date(ev.event_end_time).toLocaleString() : '—'}</td>
           <td>${ev.photo_count || 0}</td>
           <td style="display:flex;gap:0.4rem;flex-wrap:wrap">
             <a class="btn btn-ghost btn-sm" href="gallery.html?event=${ev.event_code}" target="_blank">Gallery</a>
-            <button class="btn btn-outline btn-sm" onclick="showQR('${ev.event_code}', '${ev.event_name}')">QR</button>
+            <button class="btn btn-outline btn-sm" onclick="showQR('${ev.event_code}', '${escapeAttr(ev.event_name)}')">QR</button>
             <button class="btn btn-ghost btn-sm" onclick="toggleEventStatus('${ev._id}', ${ev.is_active})">${ev.is_active ? 'Close' : 'Reopen'}</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteEvent('${ev._id}','${ev.event_name}')">Delete</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteEvent('${ev._id}','${escapeAttr(ev.event_name)}')">Delete</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    // ── Create Event form ─────────────────────────────────────────────────────
+    // ── Create event ──────────────────────────────────────────────────────────
     const nameInput = document.getElementById('new-event-name');
     const codeInput = document.getElementById('new-event-code');
 
-    // Auto-generate code from event name
     nameInput.addEventListener('input', () => {
-      if (codeInput.value) return; // don't override manual input
-      const suggestion = nameInput.value
-        .toUpperCase()
-        .replace(/[^A-Z0-9\s]/g, '')
-        .trim()
-        .split(/\s+/)
-        .map(w => w.slice(0, 4))
-        .join('')
-        .slice(0, 12);
+      if (codeInput.value) return;
+      const suggestion = nameInput.value.toUpperCase().replace(/[^A-Z0-9\s]/g, '').trim()
+        .split(/\s+/).map((w) => w.slice(0, 4)).join('').slice(0, 12);
       document.getElementById('code-suggestion').innerHTML =
-        suggestion ? `Suggested: <span onclick="codeInput.value='${suggestion}'">${suggestion}</span>` : '';
+        suggestion ? `Suggested: <span onclick="document.getElementById('new-event-code').value='${suggestion}'">${suggestion}</span>` : '';
     });
 
     codeInput.addEventListener('input', () => {
@@ -494,12 +520,10 @@
 
     document.getElementById('create-event-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const name = nameInput.value.trim();
       const code = codeInput.value.trim();
       const end  = document.getElementById('new-event-end').value;
       const mod  = document.getElementById('new-moderation').checked;
-
       if (!name || !code) return showToast('Name and code are required', 'error');
 
       document.getElementById('create-btn').disabled = true;
@@ -510,8 +534,7 @@
         method: 'POST',
         headers: adminHeaders(),
         body: JSON.stringify({
-          event_name: name,
-          event_code: code,
+          event_name: name, event_code: code,
           event_end_time: end || undefined,
           moderation_enabled: mod,
         }),
@@ -522,17 +545,15 @@
       document.getElementById('create-spinner').style.display = 'none';
 
       if (!ok) return showToast(data.message || 'Failed to create event', 'error');
-
-      showToast(`Event "${name}" created! 🎉`, 'success');
-      showQR(data.event.event_code, data.event.event_name, data.join_url);
+      showToast(`Event "${name}" created!`, 'success');
+      showQR(data.event.event_code, data.event.event_name);
       e.target.reset();
     });
 
-    let lastQrUrl = '';
-    function showQR(code, eventName, joinUrl) {
-      const url = joinUrl || `http://localhost:5500/index.html?event=${code}`;
+    function showQR(code, eventName) {
+      // Use the current frontend origin so the QR points to the live deployment
+      const url = `${window.location.origin}/index.html?event=${code}`;
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
-      lastQrUrl = qrUrl;
 
       document.getElementById('qr-popup').classList.add('visible');
       document.getElementById('qr-event-name').textContent = eventName;
@@ -540,24 +561,27 @@
       document.getElementById('qr-code-text').textContent = code;
       document.getElementById('qr-download-btn').href = qrUrl;
       document.getElementById('open-gallery-btn').href = url;
+
+      // Switch panel
+      document.querySelectorAll('.nav-item[data-panel]').forEach((n) => n.classList.remove('active'));
+      document.querySelector('[data-panel="create"]').classList.add('active');
+      document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
+      document.getElementById('panel-create').classList.add('active');
     }
 
     function copyEventLink(code) {
-      const url = `http://localhost:5500/index.html?event=${code}`;
+      const url = `${window.location.origin}/index.html?event=${code}`;
       navigator.clipboard.writeText(url).then(() => showToast('Link copied!', 'success'));
     }
-
     document.getElementById('copy-link-btn').addEventListener('click', () => {
       const code = document.getElementById('qr-code-text').textContent;
       copyEventLink(code);
     });
 
-    // ── Event status toggle ───────────────────────────────────────────────────
     async function toggleEventStatus(id, currentStatus) {
       if (!confirm(`${currentStatus ? 'Close' : 'Reopen'} this event?`)) return;
       const { ok } = await apiFetch(`/events/${id}`, {
-        method: 'PATCH',
-        headers: adminHeaders(),
+        method: 'PATCH', headers: adminHeaders(),
         body: JSON.stringify({ is_active: !currentStatus }),
       });
       if (ok) { showToast('Event updated', 'success'); loadDashboard(); loadEventsTable(); }
@@ -566,10 +590,7 @@
 
     async function deleteEvent(id, name) {
       if (!confirm(`Permanently delete "${name}" and all its photos? This cannot be undone.`)) return;
-      const { ok } = await apiFetch(`/events/${id}`, {
-        method: 'DELETE',
-        headers: adminHeaders(),
-      });
+      const { ok } = await apiFetch(`/events/${id}`, { method: 'DELETE', headers: adminHeaders() });
       if (ok) { showToast('Event deleted', 'success'); loadDashboard(); loadEventsTable(); }
       else showToast('Delete failed', 'error');
     }
@@ -580,7 +601,7 @@
       if (!ok) return;
       const select = document.getElementById('mod-event-select');
       select.innerHTML = '<option value="">Select Event…</option>';
-      (data.events || []).forEach(ev => {
+      (data.events || []).forEach((ev) => {
         const opt = document.createElement('option');
         opt.value = ev.event_code;
         opt.textContent = `${ev.event_name} (${ev.event_code})`;
@@ -591,32 +612,29 @@
     document.getElementById('mod-load-btn').addEventListener('click', async () => {
       const code = document.getElementById('mod-event-select').value;
       if (!code) return showToast('Select an event first', 'error');
-
       const { ok, data } = await apiFetch(`/photos/${code}?limit=50`, { headers: adminHeaders() });
       if (!ok) return showToast('Failed to load photos', 'error');
 
       const grid = document.getElementById('mod-grid');
       const empty = document.getElementById('mod-empty');
       grid.innerHTML = '';
-
       const photos = data.photos || [];
-      if (photos.length === 0) {
-        empty.style.display = 'flex';
-        return;
-      }
+      if (photos.length === 0) { empty.style.display = 'flex'; return; }
       empty.style.display = 'none';
 
-      photos.forEach(ph => {
+      photos.forEach((ph) => {
         const card = document.createElement('div');
         card.className = `mod-card ${!ph.approved ? 'mod-pending' : ''}`;
         card.dataset.id = ph._id;
         card.innerHTML = `
           ${!ph.approved ? '<div class="pending-badge">PENDING</div>' : ''}
           <img src="${ph.image_url}" alt="" loading="lazy" />
-          <div style="padding:0.5rem;font-size:0.75rem;color:var(--muted)">${ph.user_name} · ${new Date(ph.timestamp).toLocaleTimeString('en-MY')}</div>
+          <div style="padding:0.5rem;font-size:0.75rem;color:var(--muted)">
+            ${escapeHtml(ph.user_name)} · ${timeAgo(ph.timestamp)}
+          </div>
           <div class="mod-card-actions">
             ${!ph.approved
-              ? `<button class="btn btn-success btn-sm" style="background:rgba(39,174,96,0.2);color:#2ECC71;border:1px solid rgba(39,174,96,0.3)" onclick="approvePhoto('${ph._id}', true, this)">✓ Approve</button>`
+              ? `<button class="btn btn-sm" style="background:rgba(39,174,96,0.2);color:#2ECC71;border:1px solid rgba(39,174,96,0.3)" onclick="approvePhoto('${ph._id}', true, this)">✓ Approve</button>`
               : `<button class="btn btn-ghost btn-sm" onclick="approvePhoto('${ph._id}', false, this)">Hide</button>`
             }
             <button class="btn btn-danger btn-sm" onclick="deletePhoto('${ph._id}', this)">✕</button>
@@ -628,33 +646,35 @@
 
     async function approvePhoto(id, approve, btn) {
       const { ok } = await apiFetch(`/photos/${id}/approve`, {
-        method: 'PATCH',
-        headers: adminHeaders(),
+        method: 'PATCH', headers: adminHeaders(),
         body: JSON.stringify({ approved: approve }),
       });
       if (ok) {
         const card = btn.closest('.mod-card');
-        card.style.transition = 'opacity 0.3s';
-        card.style.opacity = '0.4';
-        showToast(approve ? 'Photo approved ✓' : 'Photo hidden', 'success');
+        card.style.transition = 'opacity 0.3s'; card.style.opacity = '0.4';
+        showToast(approve ? 'Photo approved' : 'Photo hidden', 'success');
       }
     }
 
     async function deletePhoto(id, btn) {
       if (!confirm('Delete this photo permanently?')) return;
-      const { ok } = await apiFetch(`/photos/${id}`, {
-        method: 'DELETE',
-        headers: adminHeaders(),
-      });
-      if (ok) {
-        const card = btn.closest('.mod-card');
-        card.remove();
-        showToast('Photo deleted', 'success');
-      }
+      const { ok } = await apiFetch(`/photos/${id}`, { method: 'DELETE', headers: adminHeaders() });
+      if (ok) { btn.closest('.mod-card').remove(); showToast('Photo deleted', 'success'); }
     }
 
-    // ── Init ──────────────────────────────────────────────────────────────────
-    if (adminSecret) loadDashboard();
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, (c) =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function escapeAttr(s) { return String(s ?? '').replace(/'/g, "\\'"); }
+
+    // Expose to onclick handlers
+    window.toggleEventStatus = toggleEventStatus;
+    window.deleteEvent = deleteEvent;
+    window.approvePhoto = approvePhoto;
+    window.deletePhoto = deletePhoto;
+    window.showQR = showQR;
   </script>
 </body>
 </html>

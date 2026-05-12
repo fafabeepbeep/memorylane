@@ -115,10 +115,13 @@ router.get('/:eventCode', async (req, res) => {
     const limit = parseInt(req.query.limit) || 30;
     const skip = (page - 1) * limit;
 
-    // Admin can see unapproved; public only sees approved
+    // Admin can see unapproved; public only sees approved AND non-expired
     const isAdmin = req.headers['x-admin-secret'] === process.env.ADMIN_SECRET;
     const filter = { event_id: event._id };
-    if (!isAdmin) filter.approved = true;
+    if (!isAdmin) {
+      filter.approved = true;
+      filter.expires_at = { $gt: new Date() }; // hide expired photos in real-time
+    }
 
     const [photos, total] = await Promise.all([
       Photo.find(filter)
@@ -152,6 +155,7 @@ router.get('/:eventCode/since/:timestamp', async (req, res) => {
       event_id: event._id,
       approved: true,
       timestamp: { $gt: since },
+      expires_at: { $gt: new Date() }, // exclude any that just expired
     })
       .sort({ timestamp: -1 })
       .select('-liked_by -__v')

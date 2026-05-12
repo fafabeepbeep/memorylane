@@ -51,10 +51,11 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🌐 MemoryLane frontend running at:\n`);
   console.log(`   http://localhost:${PORT}           → Landing (Join Event)`);
   console.log(`   http://localhost:${PORT}/gallery   → Photo Gallery`);
   console.log(`   http://localhost:${PORT}/admin     → Admin Panel`);
-  console.log(`   http://localhost:${PORT}/screen    → Projector Screen\n`);
+  console.log(`   http://localhost:${PORT}/screen    → Projector Screen`);
+  console.log(`\n   📱 On phone (same WiFi): http://YOUR_LAPTOP_IP:${PORT}\n`);
 });
